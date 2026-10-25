@@ -47,7 +47,7 @@ Az SDK útja `local.properties`-ben van (gitignore-olva):
    *Képernyőkép* gomb a `takeScreenshot`-ot teszteli.
 3. A *Script* dobozban modell nélkül futtathatsz akciókat (ez az aktor regressziós tesztje):
    ```json
-   [{"a":"key","k":"HOME"},{"a":"wait","ms":800},{"a":"shot"}]
+   [{"a":"open","q":"com.android.settings"},{"a":"wait","ms":1500},{"a":"shot"}]
    ```
 4. **Beállítás**: base URL (`https://ollama.com/v1`), API kulcs, modell, lépés-plafon.
    A *Modellek* gomb listázza az endpoint kínálatát.
@@ -56,6 +56,10 @@ Az SDK útja `local.properties`-ben van (gitignore-olva):
 ## Korlátok
 
 - `FLAG_SECURE` képernyők (bank, jelszókezelő, DRM) nem olvashatók: az agent `fail`-lel leáll.
+- **A cleartext `http://` engedélyezett** (network security config), mert a helyi/LAN-os
+  modellek (`http://192.168.x.x:11434/v1`, `adb reverse` + `http://127.0.0.1:…`) így működnek.
+  Ezért **ne** küldj éles API kulcsot és képernyőt titkosítatlan csatornán: HTTPS-t használj,
+  ha nem saját LAN-on fut a modell.
 - Az `ACTION_SET_TEXT` néhány custom mezőn nem működik; ilyenkor a képernyő-billentyűzet
   vision-nel való nyomkodása lenne a fallback (még nincs implementálva).
 - A jelszó/PIN/2FA beírása szándékosan tiltott a promptban.

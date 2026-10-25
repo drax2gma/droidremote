@@ -16,6 +16,7 @@ objektumot veszi).
 | `{"a":"type","n":7,"t":"Szia világ"}` | ugyanaz, de a 7-es node-ra (vagy annak editable leszármazottjára) |
 | `{"a":"scroll","n":3,"dir":"down"}` | `ACTION_SCROLL_FORWARD` a scrollable ősön; `"up"` = backward |
 | `{"a":"key","k":"BACK"}` | `GLOBAL_ACTION_*`: BACK, HOME, RECENTS, NOTIFICATIONS, QUICK_SETTINGS |
+| `{"a":"open","q":"Settings"}` | app indítása **címke vagy package** alapján (`q` = label/pakkázs, `pkg` is elfogadott) |
 | `{"a":"shot"}` | képernyőkép kérése; a kép a **következő** lépés promptjába kerül |
 | `{"a":"wait","ms":600}` | várakozás (max 10 s), settle nélkül |
 | `{"a":"done","summary":"..."}` | a feladat kész |
@@ -34,6 +35,10 @@ objektumot veszi).
   `{"a":"type","t":"..."}`.
 - `wait` nem settle-el — akkor hasznos, ha az app saját animációt futtat és a fa nem
   változik (pl. splash).
+- `open` először `getLaunchIntentForPackage`-ot próbál (package névre), aztán a launcher
+  activity-k között keres: pontos címke → részleges címke → package részlet. A találatot
+  explicit componenttel indítja (`FLAG_ACTIVITY_NEW_TASK`). A láthatósághoz a manifestben
+  `<queries>` van a MAIN/LAUNCHER intentre (Android 11 package visibility).
 
 ## Parse-szabályok
 

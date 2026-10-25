@@ -13,6 +13,7 @@ ACTIONS
 {"a":"type","n":7,"t":"szia"}          write into the editable node 7
 {"a":"scroll","n":3,"dir":"down"}      scroll a scrollable node ("up" = backwards)
 {"a":"key","k":"BACK"}                 BACK | HOME | RECENTS | NOTIFICATIONS | QUICK_SETTINGS
+{"a":"open","q":"Settings"}            launch an app by label or package name
 {"a":"shot"}                           request a screenshot of the current screen
 {"a":"wait","ms":600}
 {"a":"done","summary":"..."}           the goal is reached

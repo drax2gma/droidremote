@@ -55,6 +55,20 @@ class ActionCodecTest {
     }
 
     @Test
+    fun parsesOpenAppByLabelAndPackage() {
+        assertEquals(Action.OpenApp("Settings"), ActionCodec.parse("""{"a":"open","q":"Settings"}""").getOrThrow())
+        assertEquals(
+            Action.OpenApp("com.android.settings"),
+            ActionCodec.parse("""{"a":"open","pkg":"com.android.settings"}""").getOrThrow(),
+        )
+    }
+
+    @Test
+    fun rejectsOpenWithoutQuery() {
+        assertTrue(ActionCodec.parse("""{"a":"open"}""").isFailure)
+    }
+
+    @Test
     fun parsesScriptArray() {
         val raw = """[{"a":"key","k":"HOME"},{"a":"wait","ms":800},{"a":"shot"}]"""
         val actions = ActionCodec.parseArray(raw).getOrThrow()

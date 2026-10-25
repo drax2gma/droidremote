@@ -8,6 +8,7 @@ sealed interface Action {
     data class Type(val node: Int?, val text: String) : Action
     data class Scroll(val node: Int, val forward: Boolean) : Action
     data class Key(val code: String) : Action
+    data class OpenApp(val query: String) : Action
     data object Screenshot : Action
     data class Wait(val ms: Long) : Action
     data class Done(val summary: String) : Action

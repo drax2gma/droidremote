@@ -156,8 +156,8 @@ private fun ObserveTab(agent: AgentViewModel) {
     var script by remember {
         mutableStateOf(
             """[
-  {"a":"key","k":"HOME"},
-  {"a":"wait","ms":900},
+  {"a":"open","q":"com.android.settings"},
+  {"a":"wait","ms":1500},
   {"a":"shot"}
 ]"""
         )

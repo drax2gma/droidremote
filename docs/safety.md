@@ -39,6 +39,9 @@ a trace és az, hogy a user ott van.
   `allowBackup=false`).
 - A modell endpoint **külső**: a fa/kép elhagyja a telefont. Ez tudatos döntés; helyi
   modell esetén (Ollama a LAN-on) nincs kimenő adat.
+- A cleartext HTTP engedélyezett (`res/xml/network_security_config.xml`), hogy a LAN-os és
+  `adb reverse`-szal bekötött endpointok működjenek. Ez **titkosítatlan** csatorna: éles
+  API kulcsot és érzékeny képernyőt csak HTTPS-en keresztül küldj.
 - Az API kulcs nincs a repóban, nincs logban.
 
 ## Etika / ToS

@@ -60,6 +60,7 @@ Az Android-független rétegek szándékosan azok: ez a JVM-unit-teszt alapja
 ## Hurok
 
 ```
+0. előkészítés         → ha a saját appunk van elöl, GLOBAL_ACTION_HOME + 700 ms
 1. observe()            → Observation (fa + node map + screen)
 2. prompt               → system (assets/prompts/system.md) + actor (goal, step, lastAction, changed, fa)
 3. ModelClient.complete → 1 JSON akció

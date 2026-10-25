@@ -29,6 +29,11 @@ object ActionCodec {
                 )
                 "scroll" -> Action.Scroll(obj.getInt("n"), !obj.optString("dir", "down").equals("up", true))
                 "key" -> Action.Key(obj.getString("k").uppercase())
+                "open" -> {
+                    val query = obj.optString("q").ifBlank { obj.optString("pkg") }.trim()
+                    require(query.isNotEmpty()) { "open: hiányzó q/pkg" }
+                    Action.OpenApp(query)
+                }
                 "shot" -> Action.Screenshot
                 "wait" -> Action.Wait(obj.optLong("ms", 500))
                 "done" -> Action.Done(obj.optString("summary", ""))
@@ -63,6 +68,7 @@ object ActionCodec {
         is Action.Scroll -> JSONObject().put("a", "scroll").put("n", action.node)
             .put("dir", if (action.forward) "down" else "up")
         is Action.Key -> JSONObject().put("a", "key").put("k", action.code)
+        is Action.OpenApp -> JSONObject().put("a", "open").put("q", action.query)
         Action.Screenshot -> JSONObject().put("a", "shot")
         is Action.Wait -> JSONObject().put("a", "wait").put("ms", action.ms)
         is Action.Done -> JSONObject().put("a", "done").put("summary", action.summary)
@@ -77,6 +83,7 @@ object ActionCodec {
         is Action.Type -> "type ${action.node?.let { "@$it" } ?: "fókusz"} (${action.text.length} kar.)"
         is Action.Scroll -> "scroll @${action.node} ${if (action.forward) "le" else "fel"}"
         is Action.Key -> "key ${action.code}"
+        is Action.OpenApp -> "open ${action.query}"
         Action.Screenshot -> "shot"
         is Action.Wait -> "wait ${action.ms}ms"
         is Action.Done -> "done"

@@ -1,5 +1,6 @@
 package hu.gmz.droidremote.plan
 
+import android.accessibilityservice.AccessibilityService
 import hu.gmz.droidremote.act.Action
 import hu.gmz.droidremote.act.ActionCodec
 import hu.gmz.droidremote.observe.Observation
@@ -7,6 +8,7 @@ import hu.gmz.droidremote.observe.ScreenCapture.CaptureResult
 import hu.gmz.droidremote.observe.SettleDetector
 import hu.gmz.droidremote.service.ObserverService
 import hu.gmz.droidremote.trace.RunStore
+import kotlinx.coroutines.delay
 
 class AgentLoop(
     private val service: ObserverService,
@@ -31,6 +33,12 @@ class AgentLoop(
         val system = prompts.systemPrompt()
 
         var observation: Observation? = service.observe()
+        if (StartPlan.needsHome(observation?.packageName, service.packageName)) {
+            onEvent("indulás: HOME (a saját UI-nkból nem látunk mást)")
+            service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
+            delay(700)
+            observation = service.observe()
+        }
         if (observation == null) {
             session.finish("error", "nem olvasható képernyő")
             return Report(false, "nem olvasható képernyő (a11y szolgáltatás?)", 0, session.id)
@@ -84,10 +92,12 @@ class AgentLoop(
 
             when (action) {
                 is Action.Done -> {
+                    session.step(steps, "done: ${action.summary}", reply.text, current.treeText, true, null)
                     session.finish("done", action.summary)
                     return Report(true, action.summary.ifBlank { "kész" }, steps, session.id)
                 }
                 is Action.Fail -> {
+                    session.step(steps, "fail: ${action.why}", reply.text, current.treeText, false, null)
                     session.finish("failed", action.why)
                     return Report(false, action.why.ifBlank { "feladva" }, steps, session.id)
                 }

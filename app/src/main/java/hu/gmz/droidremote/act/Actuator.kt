@@ -2,6 +2,8 @@ package hu.gmz.droidremote.act
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
+import android.content.Intent
+import android.content.pm.ResolveInfo
 import android.graphics.Path
 import android.graphics.Rect
 import android.os.Bundle
@@ -28,6 +30,7 @@ class Actuator(private val service: AccessibilityService) {
         is Action.Type -> type(action.node, action.text, nodes)
         is Action.Scroll -> scroll(action.node, action.forward, nodes)
         is Action.Key -> key(action.code)
+        is Action.OpenApp -> openApp(action.query)
         is Action.Wait -> {
             delay(action.ms.coerceIn(0, 10_000))
             Result(true, "várakozás ${action.ms} ms")
@@ -170,6 +173,36 @@ class Actuator(private val service: AccessibilityService) {
         } else {
             Result(false, "global action elutasítva")
         }
+    }
+
+    private fun openApp(query: String): Result {
+        val direct = runCatching { service.packageManager.getLaunchIntentForPackage(query) }.getOrNull()
+        val intent = direct ?: findLauncherIntent(query) ?: return Result(false, "nem találom: $query")
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        return runCatching { service.startActivity(intent) }.fold(
+            onSuccess = { Result(true, "open ${intent.component?.packageName ?: query}") },
+            onFailure = { Result(false, "indítás hiba: ${it.message}") },
+        )
+    }
+
+    private fun findLauncherIntent(query: String): Intent? {
+        val pm = service.packageManager
+        val needle = query.trim().lowercase()
+        if (needle.isEmpty()) return null
+        val mainIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+        val candidates = runCatching { pm.queryIntentActivities(mainIntent, 0) }.getOrDefault(emptyList())
+
+        fun resolve(info: ResolveInfo) = Intent(Intent.ACTION_MAIN)
+            .addCategory(Intent.CATEGORY_LAUNCHER)
+            .setClassName(info.activityInfo.packageName, info.activityInfo.name)
+
+        val exactLabel = candidates.firstOrNull { it.loadLabel(pm).toString().lowercase() == needle }
+        if (exactLabel != null) return resolve(exactLabel)
+
+        val partialLabel = candidates.firstOrNull { it.loadLabel(pm).toString().lowercase().contains(needle) }
+        if (partialLabel != null) return resolve(partialLabel)
+
+        return candidates.firstOrNull { it.activityInfo.packageName.lowercase().contains(needle) }?.let(::resolve)
     }
 
     private fun clickableAncestor(node: AccessibilityNodeInfo?): AccessibilityNodeInfo? {
