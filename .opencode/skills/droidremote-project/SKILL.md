@@ -1,6 +1,6 @@
 ---
 name: droidremote-project
-description: droidremote — AI agent, ami a telefonon belül vezérel egy Android készüléket (AccessibilityService fa + takeScreenshot + dispatchGesture, root és board nélkül). Használd amikor a /var/home/gma/git/Android/droidremote repóban dolgozol, Android accessibility-alapú automatizálást/agentet építesz, a Pixel 2-n adb-ből verifikálsz, vagy a takeScreenshot / dispatchGesture / ACTION_SET_TEXT / settle-detektálás kerül szóba. Tartalmazza a mért csapdákat (a11y engedély elveszik reinstall után, IME kitakarja a gombokat, brew JDK 27 vs AGP, Gradle 9 wrapper-generálás).
+description: 'droidremote: Android AI agent a11y-vel (screenshot, gesture), root nélkül; Pixel 2 adb verifikáció.'
 ---
 
 # droidremote
